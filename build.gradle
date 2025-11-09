@@ -8,24 +8,19 @@ version = '1.0.0'
 archivesBaseName = 'buildermod'
 
 repositories {
-    maven {
-        name = "Fabric"
-        url = "https://maven.fabricmc.net/"
-    }
     mavenCentral()
+    maven { url = 'https://maven.fabricmc.net/' }
 }
 
 dependencies {
-    // Minecraft version
+    // Minecraft
     minecraft "com.mojang:minecraft:1.21.1"
-
-    // Yarn mappings
     mappings loom.officialMojangMappings()
 
-    // Fabric loader
+    // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:0.15.10"
 
-    // Fabric API (ต้องมี!)
+    // Fabric API
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.0+1.21.1"
 }
 
@@ -38,7 +33,6 @@ java {
 
 loom {
     splitEnvironmentSourceSets()
-
     mods {
         "buildermod" {
             sourceSet sourceSets.main
