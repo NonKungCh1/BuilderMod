@@ -1,41 +1,28 @@
 {
-	"schemaVersion": 1,
-	"id": "modid",
-	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/modid/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.example.ExampleMod"
-		],
-		"client": [
-			"com.example.ExampleModClient"
-		]
-	},
-	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.17.3",
-		"minecraft": "~1.21.10",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "buildermod",
+  "version": "${version}",
+  "name": "Builder Mode (Creative)",
+  "description": "Client-side mod for placing random blocks in creative mode.",
+  "authors": [
+    "nonkungch" // 👈 เปลี่ยนแล้ว
+  ],
+  "contact": {
+    "homepage": "https://github.com/nonkungch/BuilderMod" // 👈 เปลี่ยนแล้ว (อย่าลืมแก้ชื่อ repo)
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/buildermod/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      // ชี้ไปยังไฟล์ ClientBuilderMod.java
+      "com.nonkungch.buildermod.ClientBuilderMod" // 👈 เปลี่ยนแล้ว
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.1",
+    "fabric-api": "*",
+    "minecraft": "~1.21"
+  }
 }
