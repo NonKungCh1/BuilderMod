@@ -1,81 +1,73 @@
-package com.nonkungch.buildermod; // 👈 เปลี่ยนแล้ว
+package com.nonkungch.buildermod;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
-public class ClientBuilderMod implements ClientModInitializer {
+import java.util.Random;
 
-    public static KeyBinding keyBinding;
+public class ClientBuilderMod implements ClientModInitializer {
+    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Random random = new Random();
+
+    private static KeyBinding toggleKey;
+    private static boolean randomizerEnabled = false;
+
+    private static int selectedSlot = 0; // 0 = ช่องที่ 1
 
     @Override
     public void onInitializeClient() {
-        keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        // คีย์ลัดเปิด/ปิดระบบสุ่ม
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.buildermod.toggle",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_G,
-                "category.buildermod.general"
+                GLFW.GLFW_KEY_R,
+                "key.categories.buildermod"
         ));
 
-        registerClientTickEvent();
-        registerRightClickEvent(); 
-    }
-
-    public void registerClientTickEvent() {
+        // อีเวนต์กดปุ่ม
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            
-            while (keyBinding.wasPressed()) {
-                BuilderMode.IS_ENABLED = !BuilderMode.IS_ENABLED;
-                String message = "§aBuilder Mode: " + (BuilderMode.IS_ENABLED ? "§2ON" : "§cOFF");
-                if (client.player != null) {
-                    client.player.sendMessage(Text.literal(message), true);
+            while (toggleKey.wasPressed()) {
+                randomizerEnabled = !randomizerEnabled;
+                sendMsg("Randomizer " + (randomizerEnabled ? "§aEnabled" : "§cDisabled"));
+            }
+
+            // กดปุ่มตัวเลข 1-9 เพื่อเลือกช่อง
+            for (int i = 0; i < 9; i++) {
+                if (InputUtil.isKeyPressed(client.getWindow().getHandle(), GLFW.GLFW_KEY_1 + i)) {
+                    selectedSlot = i;
+                    sendMsg("Selected slot: " + (selectedSlot + 1));
+                }
+            }
+        });
+
+        // อีเวนต์วางบล็อก
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (randomizerEnabled && client.player != null && client.interactionManager != null) {
+                if (client.player.isUsingItem()) {
+                    // เมื่อผู้เล่นวางบล็อก — สุ่มเปลี่ยนบล็อกในช่องที่เลือก
+                    ItemStack slotStack = client.player.getInventory().getStack(selectedSlot);
+                    if (slotStack.getItem() instanceof BlockItem) {
+                        Block randomBlock = BuilderMode.getRandomBlock();
+                        ItemStack newStack = new ItemStack(randomBlock.asItem());
+                        client.player.getInventory().setStack(selectedSlot, newStack);
+                    }
                 }
             }
         });
     }
 
-    public void registerRightClickEvent() {
-        UseItemCallback.EVENT.register((player, world, hand) -> {
-            
-            if (!BuilderMode.IS_ENABLED || !player.isCreative()) {
-                return ActionResult.PASS;
-            }
-
-            MinecraftClient client = MinecraftClient.getInstance();
-            HitResult hit = client.crosshairTarget;
-
-            if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
-                
-                BlockHitResult blockHit = (BlockHitResult) hit;
-                BlockPos placePos = blockHit.getBlockPos().offset(blockHit.getSide());
-                Block blockToPlace = BuilderMode.getRandomBlock();
-
-                client.interactionManager.placeBlock(
-                        player,
-                        world,
-                        hand,
-                        new BlockHitResult(
-                                blockHit.getPos(),
-                                blockHit.getSide(),
-                                placePos,
-                                false
-                        )
-                );
-                return ActionResult.CONSUME;
-            }
-            return ActionResult.PASS;
-        });
+    private void sendMsg(String msg) {
+        if (client.player != null) {
+            client.player.sendMessage(Text.literal(msg), false);
+        }
     }
 }
