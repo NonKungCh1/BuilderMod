@@ -1,39 +1,29 @@
 package com.nonkungch.buildermod;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class BuilderMode {
-
-    private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Random RANDOM = new Random();
+    private static final List<Block> ALL_BLOCKS = new ArrayList<>();
 
-    // ช่องที่อนุญาตให้สลับ (1–9)
-    private static int minSlot = 1;
-    private static int maxSlot = 9;
-
-    // ตั้งค่าช่วงช่องที่จะสุ่ม
-    public static void setSlotRange(int min, int max) {
-        minSlot = Math.max(1, Math.min(min, 9));
-        maxSlot = Math.max(minSlot, Math.min(max, 9));
+    static {
+        for (Block block : Registries.BLOCK) {
+            // ตัดบล็อกที่ไม่น่าจะวางได้ (เช่น air, water, lava)
+            if (!block.getDefaultState().isAir()) {
+                ALL_BLOCKS.add(block);
+            }
+        }
     }
 
-    // คืนค่าช่วงปัจจุบัน
-    public static String getSlotRangeString() {
-        return minSlot + "-" + maxSlot;
-    }
-
-    // ฟังก์ชันสุ่มสลับบล็อกในมือ
-    public static void randomizeHeldBlock() {
-        if (client.player == null || client.player.getInventory() == null) return;
-
-        int randomSlot = RANDOM.nextInt(maxSlot - minSlot + 1) + minSlot - 1; // 0-index
-        ItemStack newStack = client.player.getInventory().getStack(randomSlot);
-
-        // สลับบล็อกในมือกับบล็อกที่สุ่มได้
-        int selectedSlot = client.player.getInventory().selectedSlot;
-        client.player.getInventory().setStack(selectedSlot, newStack.copy());
+    public static Block getRandomBlock() {
+        if (ALL_BLOCKS.isEmpty()) {
+            throw new IllegalStateException("No blocks found!");
+        }
+        return ALL_BLOCKS.get(RANDOM.nextInt(ALL_BLOCKS.size()));
     }
 }
