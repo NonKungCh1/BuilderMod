@@ -1,42 +1,48 @@
-// build.gradle
-
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
-    id 'maven-publish'
+    id 'fabric-loom' version '1.6.12'
+    id 'java'
 }
 
-version = "0.1.0-1.21"
-group = "com.nonkungch.buildermod" // 👈 ชื่อของคุณ ถูกต้องแล้ว
+group = 'com.nonkungch'
+version = '1.0.0'
+archivesBaseName = 'buildermod'
 
-repositories { }
+repositories {
+    maven {
+        name = "Fabric"
+        url = "https://maven.fabricmc.net/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    // Minecraft version
+    minecraft "com.mojang:minecraft:1.21.1"
+
+    // Yarn mappings
+    mappings loom.officialMojangMappings()
+
+    // Fabric loader
+    modImplementation "net.fabricmc:fabric-loader:0.15.10"
+
+    // Fabric API (ต้องมี!)
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.0+1.21.1"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    withSourcesJar()
+}
 
 loom {
     splitEnvironmentSourceSets()
+
     mods {
         "buildermod" {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
-    }
-}
-
-// --- ส่วนนี้คือส่วนที่บอกให้ Gradle ดาวน์โหลด Minecraft และ Fabric API ---
-dependencies {
-    // นี่คือ Minecraft 1.21
-    minecraft "com.mojang:minecraft:1.21"
-    mappings loom.officialMojangMappings()
-    
-    // นี่คือ Fabric Loader
-    modImplementation "net.fabricmc:fabric-loader:0.16.1"
-    
-    // นี่คือ Fabric API (ที่ Error กำลังถามหา)
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.100.3+1.21"
-}
-// ----------------------------------------------
-
-processResources {
-    inputs.property "version", version
-    filesMatching("fabric.mod.json") {
-        expand "version": version
     }
 }
