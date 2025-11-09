@@ -1,6 +1,12 @@
 plugins {
-    id 'fabric-loom' version '1.6.12'
-    id 'java'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.9"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.15.11"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.105.0+1.21.9"
 }
 
 group = 'com.nonkungch'
@@ -10,18 +16,6 @@ archivesBaseName = 'buildermod'
 repositories {
     mavenCentral()
     maven { url = 'https://maven.fabricmc.net/' }
-}
-
-dependencies {
-    // Minecraft
-    minecraft "com.mojang:minecraft:1.21.1"
-    mappings loom.officialMojangMappings()
-
-    // Fabric Loader
-    modImplementation "net.fabricmc:fabric-loader:0.15.10"
-
-    // Fabric API
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.102.0+1.21.1"
 }
 
 java {
